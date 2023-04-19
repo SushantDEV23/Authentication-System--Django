@@ -31,7 +31,7 @@ def register(request):
             if User.objects.filter(email=email).first():
                 messages.success(request, 'Email already exist.')
                 return redirect('/register')
-        #creating user object
+        #creating user object because it does not exists
             user_obj=User.objects.create(username=username, email=email)
             user_obj.set_password(password)
             user_obj.save()
@@ -58,12 +58,12 @@ def login(request):
             messages.success(request, 'User does not exist')
             return redirect('/login')
 
-        profile_obj=Profile.objects.filter(user=user_obj).first()
+        profile_obj=Profile.objects.filter(user=user_obj).first()   #If a username is there we are checking his whether his profile is verified or not
         if not profile_obj.is_verified:
             messages.success(request, 'Your profile is not verified')
-            return redirect('/login')
+            return redirect('/register')
 
-        user=authenticate(username=username, password=password)
+        user=authenticate(username=username, password=password)     #if a profile is verified then we will authenticate him with username and password
         if user is None:
             messages.success(request, 'Wrong Password')
             return redirect('/login')
@@ -83,7 +83,7 @@ def token_send(request):
 
 def verify_user(request, auth_token):
     try:
-        profile_obj=Profile.objects.filter(auth_token=auth_token).first()
+        profile_obj=Profile.objects.filter(auth_token=auth_token).first()      #To check if the Profile is already verified or not
         if(profile_obj):
             if profile_obj.is_verified:
                 messages.success(request, 'Your account is already verified')
